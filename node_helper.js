@@ -27,6 +27,9 @@ module.exports = NodeHelper.create({
           pattern = response.body.stateDescription.pattern;
           item_value = this.convertState(state, pattern);
         }
+        if (response.body.type == 'Contact') {
+          item_value = response.body.state;
+        }
         this.sendSocketNotification("ITEM_VALUE_UPDATED", {
           item_name: item_name,
           item_value: item_value,
@@ -105,6 +108,11 @@ module.exports = NodeHelper.create({
           state = response.body.state;
           pattern = response.body.stateDescription.pattern;
           item_value = this.convertState(state, pattern);
+          item_only_view = true;
+        }
+        if (response.body.type == 'Contact') {
+          item_type = 'Contact';
+          item_value = response.body.state;
           item_only_view = true;
         }
 

@@ -14,17 +14,27 @@ Module.register('MMM-OpenHAB-Items', {
 
   start: function() {
     Log.info("Starting module: " + this.name);
+    this.items = [];
+    this.itemLabels = {};
     if (this.config.url == null) {
       Log.error("MMM-OpenHAB-Items.js: url parameter in config not found.");
       return;
     }
     for (var i in this.config.items) {
       var item = this.config.items[i];
+      if (item.stateLabels) {
+        this.itemLabels[item.item_name] = item.stateLabels;
+      }
       this.addItem(this.config.url, item);
     }
     setTimeout(() => {
       this.updateItemValues();
     }, this.config.updateInterval * 1000);
+  },
+
+  resolveStateValue: function(item_name, state) {
+    var labels = Object.assign({}, this.config.stateLabels, this.itemLabels[item_name]);
+    return labels[state] || state;
   },
 
 
@@ -50,13 +60,13 @@ Module.register('MMM-OpenHAB-Items', {
         item_name: payload.item_name,
         icon: payload.icon,
         item_type: payload.item_type,
-        item_value: payload.item_value,
+        item_value: this.resolveStateValue(payload.item_name, payload.item_value),
         item_only_view: payload.item_only_view,
       })
     }
     if (notification == 'ITEM_VALUE_UPDATED') {
       item_name = payload.item_name;
-      item_value = payload.item_value;
+      item_value = this.resolveStateValue(payload.item_name, payload.item_value);
       for (var i in this.items) {
         var item = this.items[i];
         if (item.item_name == item_name) {
@@ -102,7 +112,7 @@ Module.register('MMM-OpenHAB-Items', {
 
       item_value = document.createElement("span")
 
-      if (item.item_type == 'Number') {
+      if (item.item_type == 'Number' || item.item_type == 'Contact') {
          item_value.innerHTML = item.item_value;
       }
 

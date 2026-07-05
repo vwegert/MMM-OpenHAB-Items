@@ -6,6 +6,7 @@ Supported Items:
  * Rollershutter
  * Switch (does not show the current state of your switch. it will only toggle the switch)
  * Number (and Group:Number)
+ * Contact (shows the state as text, e.g. OPEN/CLOSED)
 
 ![example1.png](https://raw.githubusercontent.com/hggh/MMM-OpenHAB-Items/main/img/example1.png)
 
@@ -31,14 +32,18 @@ example configuration:
 		header: "OpenHAB", // optional
 		config: {
 			url: "https://username:password@openhab.example/rest/items/",
+			stateLabels: { "OPEN": "Offen", "CLOSED": "Geschlossen" }, // optional, applied to all items
 			items: [
 				{
 					item_name: "TableLight",
 					icon: "light",
-					
 				},
 				{
 					item_name: "Rolladen_Balkon",
+				},
+				{
+					item_name: "TubBath_RightWindowState",
+					stateLabels: { "OPEN": "Geöffnet" }, // optional, merged over global labels
 				}
 			],
                 
